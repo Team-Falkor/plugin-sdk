@@ -1,8 +1,25 @@
 {
-  "name": "falkor-plugin-sdk",
-  "version": "1.0.50",
+  "name": "@team-falkor/plugin-sdk",
+  "version": "0.1.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "import": "./dist/index.js",
+    "require": "./dist/index.cjs"
+  },
+  "license": "MIT",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "bun run build.ts",
+    "prepublishOnly": "bun run build",
     "dev": "bun run --watch src/index.ts"
   },
   "dependencies": {
@@ -11,7 +28,10 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "bun-plugin-dts": "^0.3.0",
     "bun-types": "latest"
   },
-  "module": "src/index.js"
+  "peerDependencies": {
+    "typescript": "^5"
+  }
 }
