@@ -1,6 +1,6 @@
 import Elysia, { t } from "elysia";
 import cors from "@elysiajs/cors";
-import {
+import type {
   CreatePluginExtraOptions,
   HandleReturnFunction,
   HandleSearchFunction,

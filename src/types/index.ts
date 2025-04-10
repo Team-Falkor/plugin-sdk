@@ -1,5 +1,5 @@
-import { PluginSearchResponse } from "./providers";
-import { PluginSetupWithoutConfig } from "./setup";
+import { type PluginSearchResponse } from "./providers";
+import { type PluginSetupWithoutConfig } from "./setup";
 
 export type HandleSearchFunction = (os: string, query: string) => PromiseLike<Array<PluginSearchResponse>>;
 export type HandleReturnFunction = (returned: string) => PromiseLike<Array<string>>;

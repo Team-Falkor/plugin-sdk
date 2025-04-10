@@ -40,3 +40,13 @@ yarn-error.log*
 **/*.log
 package-lock.json
 **/*.bun
+
+# env
+.env
+
+# npm
+.npmrc
+
+# dist
+dist/**
+dist/**.* 

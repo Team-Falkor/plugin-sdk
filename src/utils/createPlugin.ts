@@ -1,5 +1,4 @@
-import Elysia from "elysia";
-import { CreatePluginOptions, PluginSetupJSON } from "../types";
+import  type { CreatePluginOptions } from "../types";
 import { plugin } from "./buildPlugin";
 
 
