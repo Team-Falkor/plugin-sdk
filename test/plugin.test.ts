@@ -1,6 +1,6 @@
+import { PluginSetupJSON } from "@team-falkor/shared-types";
 import { describe, expect, test } from "bun:test";
 import { Colors } from "../src/utils/colors";
-import type { PluginSetupJSON } from "../src/types/setup";
 
 describe("Plugin SDK", () => {
   describe("createPlugin", () => {
@@ -12,13 +12,15 @@ describe("Plugin SDK", () => {
         multiple_choice: false,
         name: "Test Plugin",
         description: "A test plugin",
-        logo: "test-logo.svg"
+        logo: "test-logo.svg",
+        api_url: "https://example.com",
+        setup_path: "/setup.json",
       };
 
       // Validate plugin ID format (matches PluginId type)
       expect(mockSetup.id.split(".").length).toBeGreaterThanOrEqual(2);
       expect(mockSetup.id.split(".").length).toBeLessThanOrEqual(3);
-      
+
       // Validate other required fields
       expect(typeof mockSetup.version).toBe("string");
       expect(typeof mockSetup.name).toBe("string");
@@ -34,7 +36,9 @@ describe("Plugin SDK", () => {
         multiple_choice: false,
         name: "Test Plugin",
         description: "A test plugin",
-        logo: "test-logo.svg"
+        logo: "test-logo.svg",
+        api_url: "https://example.com",
+        setup_path: "/setup.json",
       };
 
       const pluginConfig = {
@@ -42,7 +46,7 @@ describe("Plugin SDK", () => {
         port: 3001,
         handleSearch: async () => [],
         handleReturn: async () => ({}),
-        options: { debug: true }
+        options: { debug: true },
       };
 
       expect(pluginConfig.options?.debug).toBe(true);

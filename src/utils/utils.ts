@@ -1,3 +1,3 @@
-import type { PluginSetupJSON } from "../types";
+import { PluginSetupWithoutConfig } from "../types";
 
-export const createSetup = (setup: Omit<PluginSetupJSON, "config">) => ({...setup})
+export const createSetup = (setup: PluginSetupWithoutConfig) => ({ ...setup });

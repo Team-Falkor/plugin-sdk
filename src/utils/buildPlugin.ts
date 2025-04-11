@@ -1,11 +1,13 @@
-import Elysia, { t } from "elysia";
 import cors from "@elysiajs/cors";
+import {
+  PluginSearchResponse,
+  PluginSetupJSON,
+} from "@team-falkor/shared-types";
+import Elysia, { t } from "elysia";
 import type {
   CreatePluginExtraOptions,
   HandleReturnFunction,
   HandleSearchFunction,
-  PluginSearchResponse,
-  PluginSetupJSON,
   PluginSetupWithoutConfig,
 } from "../types";
 import { Colors } from "./colors";
@@ -70,17 +72,18 @@ export class Plugin {
       const apiUrl = this.setupData?.api_url ?? server.url.href;
 
       // Ensure the setup object has required URL properties
-    
 
       if (!this.setupData) {
         console.error(Colors.create(`Setup data is null`).red);
-        return
-      };
+        return;
+      }
 
       this.setupData = {
         ...this.setupData,
         api_url: apiUrl,
-        setup_path: this.setupData?.setup_path ? this.setupData.setup_path : `/setup.json`,
+        setup_path: this.setupData?.setup_path
+          ? this.setupData.setup_path
+          : `/setup.json`,
       };
 
       if (this.debug) {
@@ -121,8 +124,8 @@ export class Plugin {
         if (!search) return this.setupData;
 
         if (!this.setupData) {
-            console.error(Colors.create(`Setup data is null`).red);
-            return null
+          console.error(Colors.create(`Setup data is null`).red);
+          return null;
         }
 
         const setupResponse: PluginSetupJSON = {
