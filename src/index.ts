@@ -1,5 +1,4 @@
-import { createPlugin } from "./utils/createPlugin"
-import { Colors,colors } from "./utils/colors"
+export { Colors, colors } from "./plugin/utils/colors";
+export { createPlugin } from "./plugin/utils/createPlugin";
 
-export {createPlugin, Colors, colors}
-
+export type { CreatePluginOptions } from "./types";

@@ -1,6 +1,6 @@
 import { PluginSetupJSON } from "@team-falkor/shared-types";
 import { describe, expect, test } from "bun:test";
-import { Colors } from "../src/utils/colors";
+import { Colors } from "../src/plugin/utils/colors";
 
 describe("Plugin SDK", () => {
   describe("createPlugin", () => {

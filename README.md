@@ -1,99 +1,111 @@
 # Falkor Plugin SDK
 
-The Falkor Plugin SDK is a TypeScript-based toolkit for building and managing plugins within the Falkor ecosystem. It leverages the power of [Elysia](https://elysiajs.com/) for a robust server framework and is optimized for the [Bun](https://bun.sh/) runtime.
+The **Falkor Plugin SDK** is a TypeScript toolkit for building and managing plugins within the **Falkor ecosystem** ([Falkor GitHub](https://github.com/Team-Falkor/falkor)). It uses [Elysia](https://elysiajs.com/) as the web framework and is optimized for the [Bun](https://bun.sh/) runtime.
 
-## Key Features
+## 🚀 Key Features
 
-- **Streamlined Plugin API:** Easily create plugins with a simple and intuitive interface.
-- **Built-in Handlers:** Comes with pre-configured search and return handlers.
-- **TypeScript-Ready:** Enjoy full TypeScript support right out of the box.
-- **CORS Support:** Integrated CORS support via [@elysiajs/cors](https://www.npmjs.com/package/@elysiajs/cors).
-- **Debug Options:** Configurable debugging to help streamline your development process.
+- **Streamlined Plugin API** – Build plugins easily with a clean and intuitive interface for the Falkor ecosystem.
+- **Built-in Handlers** – Includes default setup for `search` and `return` routes.
+- **TypeScript Support** – Full typings and type safety throughout the SDK.
+- **CORS Integration** – Out-of-the-box support via [@elysiajs/cors](https://www.npmjs.com/package/@elysiajs/cors).
+- **Debug Logging** – Optional debug mode with color-coded console output for easier development.
 
-## Installation
+## 📦 Installation
 
-Install the SDK using your preferred package manager:
+Install via your favorite package manager:
 
 ```bash
-# Using npm
 npm install @team-falkor/plugin-sdk
+```
 
-# Using yarn
+```bash
 yarn add @team-falkor/plugin-sdk
+```
 
-# Using bun
+```bash
+pnpm add @team-falkor/plugin-sdk
+```
+
+```bash
 bun add @team-falkor/plugin-sdk
 ```
 
-## Quick Start
+## ⚡ Quick Start
 
-Below is a quick example to get you started:
+Here's an example of how to create a plugin for Falkor using the SDK:
 
-```typescript
-import { createPlugin } from 'falkor-plugin-sdk';
+```ts
+import { createPlugin } from "falkor-plugin-sdk";
 
-const plugin = createPlugin({
+createPlugin({
   setup: {
     id: "my.awesome.plugin",
     version: "1.0.0",
     multiple_choice: false,
-    name: 'my-plugin',
-    description: 'My awesome Falkor plugin',
-    logo: "URL_ADDRESS_to_image.com",
-    banner: "URL_ADDRESS_to_image.com" // optional,
+    name: "my-plugin",
+    description: "My awesome Falkor plugin",
+    logo: "https://yourdomain.com/logo.png",
+    banner: "https://yourdomain.com/banner.png", // Optional
+    api_url: "htpps://yourdomain.com",
+    setup_url: `/setup.json?search=["config-option-1", "config-option-2"]`, // used for auto updating the plugin
   },
   port: 3000,
   handleSearch: async (query) => {
-    // Implement your search logic here
-    return { results: [] };
+    // Your search logic here
+    return { results: [{}] };
   },
   handleReturn: async (data) => {
     // Handle return data here
-    return { success: true };
+    // You have to return an array of links but you can send as many links as you want
+    return ["link1", "link2"];
   },
   options: {
-    debug: true, // Enable debug mode
+    debug: true, // Enable debug mode for verbose logs
   },
 });
 ```
 
-## API Reference
+## 📚 API Reference
 
 ### `createPlugin(options)`
 
-Creates a new Falkor plugin instance with the specified configuration.
+Creates and starts a new plugin server for Falkor.
 
-#### Options
+#### Parameters
 
-- **`setup`** (object): Plugin metadata.
-  - **`id`**: A unique identifier for the plugin.
-  - **`version`**: The version of the plugin, used to determine compatibility.
-  - **`multiple_choice`**: A boolean indicating whether the needs an extra request to get the source. If `true`, additional requests may be needed to fetch source links.
-  - **`name`**: The name of the plugin, displayed in the settings menu.
-  - **`description`**: A description of the plugin, shown in the settings menu.
-  - **`logo`**: A URL to the plugin's logo, displayed in the settings menu.
-  - **`banner`**: A URL to the plugin's banner, displayed in the settings menu. (Optional)
-  - **`api_url`**: The base URL for the plugin's API, used for making requests.
-  - **`author`**: Information about the author of the plugin. (Optional)
-  - **`setup_path`**: Used for updating the plugin from within the app
-- **`port`** (number): The port number on which the plugin server will run.
-- **`handleSearch`** (async function): Function to process search requests.
-- **`handleReturn`** (async function): Function to process return data.
-- **`options`** (object): Additional configuration settings.
-  - **`debug`** (boolean): Enable debug mode for more verbose logging.
+- **`setup`** (object) – Plugin metadata and configuration:
 
-## Development
+  - `id`: Unique identifier for the plugin.
+  - `version`: Version number for compatibility checks.
+  - `multiple_choice`: If `true`, the plugin requires additional requests to fetch sources.
+  - `name`: Display name of the plugin.
+  - `description`: Short description of the plugin functionality.
+  - `logo`: URL to the plugin's logo (square image).
+  - `banner`: URL to the plugin's banner (optional).
+  - `api_url`: Optional base URL for your plugin API.
+  - `author`: Optional information about the plugin author.
+  - `setup_path`: Path to access the setup data, default is `/setup.json`.
 
-To start the development server with hot reload, run:
+- **`port`** (number) – The port on which the plugin server will run.
+- **`handleSearch`** (function) – Async function to handle search requests.
+- **`handleReturn`** (function) – Async function to handle return data.
+- **`options`** (object) – Additional configuration:
+  - `debug` (boolean): Enable debug mode for detailed logging.
+
+## 🛠 Development
+
+To run the development server with hot reload, use:
 
 ```bash
 bun run dev
 ```
 
-## Contributing
+Ensure you have `bun` installed globally.
 
-Contributions are highly appreciated! If you have suggestions or improvements, feel free to submit a pull request.
+## 🤝 Contributing
 
-## License
+We welcome contributions! If you have suggestions or improvements, feel free to open issues or submit pull requests.
 
-This project is licensed under the [MIT License](LICENSE).
+## 📄 License
+
+This project is licensed under the [MIT License](./LICENSE).

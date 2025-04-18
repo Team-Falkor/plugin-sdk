@@ -1,0 +1,164 @@
+# Using createPlugin
+
+## Overview
+
+The `createPlugin` function is the core component of the Falkor Plugin SDK that helps you create and configure plugins. This guide will walk you through how to use it effectively.
+
+## Basic Usage
+
+Here's a basic example of how to create a plugin:
+
+```typescript
+import { createPlugin } from 'falkor-plugin-sdk';
+
+const plugin = createPlugin({
+  setup: {
+    id: "my.plugin.id",      // Must follow format: name.plugin.id
+    version: "1.0.0",
+    multiple_choice: false,  // Set to true if your plugin needs multiple steps
+    name: 'My Plugin',
+    description: 'A description of what your plugin does',
+    logo: "https://example.com/logo.png",
+    banner: "https://example.com/banner.png" // Optional
+  },
+  port: 3000,  // The port your plugin will run on
+  handleSearch: async (query) => {
+    // Implement your search logic here
+    return [];
+  },
+  handleReturn: async (data) => {
+    // Optional: Handle return data for multiple choice plugins
+    return [];
+  },
+  options: {
+    debug: true  // Optional: Enable debug mode
+  }
+});
+```
+
+## Configuration Options
+
+### Required Fields
+
+- **setup**: The basic configuration for your plugin
+  - `id`: A unique identifier following the format `name.plugin.id`
+  - `version`: Your plugin's version number
+  - `multiple_choice`: Set to `true` if your plugin needs multiple steps
+  - `name`: The display name of your plugin
+  - `description`: A brief description of what your plugin does
+  - `logo`: URL to your plugin's logo
+  - `banner`: (Optional) URL to your plugin's banner image
+
+- **port**: The port number your plugin will run on
+
+- **handleSearch**: The main search function that processes queries
+  ```typescript
+  handleSearch: async (query: string) => {
+    // Your search logic here
+    return [
+      {
+        type: "ddl", // or "torrent", "magnet"
+        name: "Example Result",
+        return: "https://example.com/download",
+        size: 1024,
+        multiple_choice: false // Override setup.multiple_choice if needed
+      }
+    ];
+  }
+  ```
+
+### Optional Fields
+
+- **handleReturn**: Required only if `multiple_choice` is true
+  ```typescript
+  handleReturn: async (data: string) => {
+    // Process the return data
+    return ["final-download-link"];
+  }
+  ```
+
+- **options**: Additional configuration options
+  ```typescript
+  options: {
+    debug: true  // Enable debug logging
+  }
+  ```
+
+## Response Formats
+
+### Search Response
+
+Your `handleSearch` function should return an array of objects following these formats:
+
+#### For Direct Downloads (DDL)
+```typescript
+{
+  type: "ddl",
+  name: "Example Game",
+  return: "https://example.com/download",
+  size: 1024,
+  multiple_choice: false
+}
+```
+
+#### For Torrents or Magnets
+```typescript
+{
+  type: "torrent", // or "magnet"
+  seeds: 100,
+  name: "Example Game",
+  uploader: "example",
+  return: "base64-string",
+  size: 1024,
+  multiple_choice: false
+}
+```
+
+### Return Response
+
+If your plugin uses `multiple_choice`, your `handleReturn` function should return:
+```typescript
+["final-download-link"]
+```
+
+## Best Practices
+
+1. **Error Handling**: Always implement proper error handling in your search and return functions.
+
+2. **Debug Mode**: Use the debug option during development to get detailed logs:
+   ```typescript
+   options: { debug: true }
+   ```
+
+3. **Multiple Choice**: Only enable `multiple_choice` if your plugin genuinely needs a two-step process.
+
+4. **Port Selection**: Choose a port number that's unlikely to conflict with other services.
+
+## Testing
+
+You can test your plugin implementation using the SDK's testing utilities:
+
+```typescript
+import { createPlugin } from 'falkor-plugin-sdk';
+
+describe("plugin tests", () => {
+  test("basic search functionality", async () => {
+    const plugin = createPlugin({
+      setup: {
+        id: "test.plugin",
+        version: "1.0.0",
+        multiple_choice: false,
+        name: "Test Plugin",
+        description: "Test plugin description",
+        logo: "test-logo.svg"
+      },
+      port: 3000,
+      handleSearch: async () => []
+    });
+
+    // Add your test assertions here
+  });
+});
+```
+
+This guide covers the basics of using `createPlugin`. For more advanced usage and examples, refer to the SDK documentation and example plugins.

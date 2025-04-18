@@ -9,7 +9,7 @@ import type {
   HandleReturnFunction,
   HandleSearchFunction,
   PluginSetupWithoutConfig,
-} from "../types";
+} from "../../types";
 import { Colors } from "./colors";
 
 export class Plugin {
@@ -30,16 +30,10 @@ export class Plugin {
     return Plugin.instance;
   }
 
-  /**
-   * Set the initial configuration for the plugin.
-   */
   public set setupApp(setup: PluginSetupWithoutConfig) {
     this.setupData = setup;
   }
 
-  /**
-   * Set handlers for search and (optionally) return functionality.
-   */
   public set handlers(handlers: {
     search: HandleSearchFunction;
     return?: HandleReturnFunction;
@@ -48,83 +42,93 @@ export class Plugin {
     this.returnHandler = handlers.return ?? null;
   }
 
-  /**
-   * Set extra options such as debugging.
-   */
   public set extraOptions(options: CreatePluginExtraOptions) {
     this.debug = options.debug ?? false;
   }
 
-  /**
-   * Start listening on the provided port.
-   */
   public listen(port: number): void {
     if (this.hasAppStarted) {
-      throw new Error("App has already started, cannot start again");
+      throw new Error("App has already started and cannot be started again.");
     }
+
     if (!this.setupData) {
-      throw new Error("Setup not set, please use setupApp setter first.");
+      throw new Error(
+        "Plugin setup is missing. Please set `createPlugin({setup: {}})` first."
+      );
     }
+
     this.hasAppStarted = true;
     this.setupRoutes();
 
     this.app.listen(port, (server) => {
-      const apiUrl = this.setupData?.api_url ?? server.url.href;
-
-      // Ensure the setup object has required URL properties
+      const apiUrl = this.setupData?.api_url?.length
+        ? this.setupData.api_url
+        : server.url.href;
 
       if (!this.setupData) {
-        console.error(Colors.create(`Setup data is null`).red);
+        console.error(
+          Colors.create("[plugin] Setup data is null").red.bold.toString()
+        );
         return;
       }
 
       this.setupData = {
         ...this.setupData,
         api_url: apiUrl,
-        setup_path: this.setupData?.setup_path
-          ? this.setupData.setup_path
-          : `/setup.json`,
+        setup_path: this.setupData.setup_path || `/setup.json`,
       };
 
       if (this.debug) {
-        console.info(`Plugin running on ${apiUrl}`);
+        console.info(
+          Colors.create("[plugin] Plugin is now running at ")
+            .green.bold.withSuffix(apiUrl)
+            .toString()
+        );
       }
+
+      const installLink = `falkor://install-plugin/${apiUrl}/setup.json`;
+      console.log(
+        Colors.create("[plugin] Install via: ")
+          .cyan.bold.withSuffix(installLink)
+          .toString()
+      );
     });
   }
 
-  /**
-   * Returns the underlying Elysia app instance.
-   */
   public get appInstance(): Elysia {
     if (!this.setupData) {
-      throw new Error("Setup not set, please use setupApp setter first.");
+      throw new Error("Plugin setup is missing. Please set `setupApp` first.");
     }
     return this.app;
   }
 
-  /**
-   * Setup the API routes.
-   */
   private setupRoutes(): void {
     if (!this.setupData) {
-      throw new Error("Setup not set, please use setupApp setter first.");
+      throw new Error("Plugin setup is missing. Please set `setupApp` first.");
     }
 
-    // Setup route for retrieving setup configuration
     this.app.get(
       "/setup.json",
       ({ query }) => {
         const search = query?.search;
+
         if (this.debug) {
           console.log(
-            Colors.create("Setup Requested").toString(),
-            Colors.create(`Search: ${search}`).toString()
+            Colors.create("[plugin] Setup route hit").blue.toString(),
+            search
+              ? Colors.create(
+                  `Search terms: ${search.join(", ")}`
+                ).magenta.toString()
+              : ""
           );
         }
-        if (!search) return this.setupData;
 
         if (!this.setupData) {
-          console.error(Colors.create(`Setup data is null`).red);
+          console.error(
+            Colors.create(
+              "[plugin] Error: Setup data is null"
+            ).red.bold.toString()
+          );
           return null;
         }
 
@@ -132,6 +136,7 @@ export class Plugin {
           ...this.setupData,
           config: search ? { search } : false,
         };
+
         return setupResponse;
       },
       {
@@ -143,23 +148,25 @@ export class Plugin {
       }
     );
 
-    // Setup search route
     this.app.get(
       "/search/:os/:query",
       async ({ params }): Promise<Array<PluginSearchResponse>> => {
         if (!this.searchHandler) {
-          throw new Error("Search handler not set");
+          throw new Error("Search handler is not set.");
         }
+
         const { os, query } = params;
         const results = await this.searchHandler(os, query);
+
         if (this.debug) {
           console.log(
-            Colors.create("Search Requested").green.toString(),
-            Colors.create(`OS: ${os}`).toString(),
-            Colors.create(`Query: ${query}`).toString(),
-            Colors.create(`Results: ${results.length}`).toString()
+            Colors.create("[plugin] Search triggered").green.toString(),
+            Colors.create(`OS: ${os}`).yellow.toString(),
+            Colors.create(`Query: ${query}`).yellow.toString(),
+            Colors.create(`Result count: ${results.length}`).green.toString()
           );
         }
+
         return results;
       },
       {
@@ -170,20 +177,21 @@ export class Plugin {
       }
     );
 
-    // Setup return route if a handler is provided
     if (this.returnHandler) {
       this.app.get(
         "/return/:returned",
         async ({ params }): Promise<Array<string>> => {
           const { returned } = params;
           const results = await this.returnHandler!(returned);
+
           if (this.debug) {
             console.log(
-              Colors.create("Return Requested").toString(),
-              Colors.create(`Returned: ${returned}`).toString(),
-              Colors.create(`Results: ${results.length}`).toString()
+              Colors.create("[plugin] Return route hit").cyan.toString(),
+              Colors.create(`Returned: ${returned}`).magenta.toString(),
+              Colors.create(`Result count: ${results.length}`).green.toString()
             );
           }
+
           return results;
         },
         {
@@ -193,10 +201,13 @@ export class Plugin {
         }
       );
     } else if (this.debug) {
-      console.warn("Return handler not set, skipping /return route");
+      console.warn(
+        Colors.create(
+          "[plugin] Skipping /return route - no return handler set"
+        ).yellow.toString()
+      );
     }
   }
 }
 
-// Export a singleton instance for external use
 export const plugin = Plugin.getInstance();
