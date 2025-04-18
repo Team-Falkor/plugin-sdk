@@ -1,6 +1,8 @@
 import type Elysia from "elysia";
 import type { CreatePluginOptions } from "../../types";
-import { plugin } from "./buildPlugin";
+import { Plugin } from "../Plugin";
+
+const plugin = Plugin.instance;
 
 /**
  * Configure and start your Falkor plugin in one go.
@@ -17,7 +19,13 @@ export function createPlugin({
   port,
   handleSearch,
   handleReturn,
-  options: { debug = false } = {},
+  handleSetup,
+  options = {
+    debug: false,
+  },
+  routeOptions = {
+    typeOfConfig: "query",
+  },
 }: CreatePluginOptions): Elysia {
   if (!setup) {
     throw new Error("`setup` object is required to initialize the plugin.");
@@ -34,9 +42,11 @@ export function createPlugin({
   plugin.handlers = {
     search: handleSearch,
     ...(handleReturn && { return: handleReturn }),
+    ...(handleSetup && { setup: handleSetup }),
   };
 
-  plugin.extraOptions = { debug };
+  plugin.extraOptions = { ...options };
+  plugin.routeConfig = { ...routeOptions };
 
   plugin.listen(port);
 

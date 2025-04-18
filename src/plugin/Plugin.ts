@@ -2,9 +2,11 @@ import cors from "@elysiajs/cors";
 import Elysia from "elysia";
 import type {
   CreatePluginExtraOptions,
+  CustomHandleSetupFunction,
   HandleReturnFunction,
   HandleSearchFunction,
   PluginSetupWithoutConfig,
+  SetupJsonOptions,
 } from "../types";
 import {
   registerReturnRoute,
@@ -16,8 +18,12 @@ import { Colors } from "./utils/colors";
 export class Plugin {
   private app = new Elysia().use(cors());
   private debug = false;
+  private routeOptions: SetupJsonOptions = {
+    typeOfConfig: "query",
+  };
   private searchHandler: HandleSearchFunction | null = null;
   private returnHandler: HandleReturnFunction | null = null;
+  private customSetupHandler: CustomHandleSetupFunction | null = null;
   private setupData: PluginSetupWithoutConfig | null = null;
   private started = false;
 
@@ -37,17 +43,25 @@ export class Plugin {
   public set handlers({
     search,
     return: ret,
+    setup,
   }: {
     search: HandleSearchFunction;
     return?: HandleReturnFunction;
+    setup?: CustomHandleSetupFunction;
   }) {
     this.searchHandler = search;
     this.returnHandler = ret ?? null;
+    this.customSetupHandler = setup ?? null;
   }
 
   /** Extra options (e.g. debug) */
   public set extraOptions(opts: CreatePluginExtraOptions) {
     this.debug = opts.debug ?? false;
+  }
+
+  /** Route options  */
+  public set routeConfig(opts: SetupJsonOptions) {
+    this.routeOptions = opts;
   }
 
   /** Kick off the HTTP server */
@@ -62,7 +76,9 @@ export class Plugin {
     this.started = true;
     this.registerRoutes();
     this.app.listen(port, (ctx) => {
-      const url = this.setupData!.api_url ?? ctx.url.href;
+      const url = this.setupData?.api_url?.length
+        ? this.setupData?.api_url
+        : ctx.url.href;
       if (this.debug) {
         console.info(
           Colors.create("[plugin] Listening on ")
@@ -92,7 +108,13 @@ export class Plugin {
       throw new Error("Missing setupData; call setupApp first");
     }
 
-    registerSetupRoute(this.app, this.setupData, this.debug);
+    registerSetupRoute(
+      this.app,
+      this.setupData,
+      this.debug,
+      this.customSetupHandler,
+      this.routeOptions
+    );
     registerSearchRoute(this.app, () => this.searchHandler, this.debug);
     registerReturnRoute(this.app, () => this.returnHandler, this.debug);
   }
