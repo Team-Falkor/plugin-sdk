@@ -42,11 +42,6 @@ jobs:
           version=$(bun -e "console.log(require('./package.json').version)")
           echo "current-version=$version" >> $GITHUB_OUTPUT
 
-      - name: Generate changelog
-        run: npx changelogithub
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
