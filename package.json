@@ -1,6 +1,27 @@
 {
   "name": "@team-falkor/plugin-sdk",
   "version": "1.0.0",
+  "description": "A TypeScript SDK for building Falkor plugins with Elysia framework integration",
+  "keywords": [
+    "falkor",
+    "plugin",
+    "sdk",
+    "typescript",
+    "elysia",
+    "framework",
+    "plugin-development",
+    "api",
+    "web-framework"
+  ],
+  "homepage": "https://github.com/Team-Falkor/plugin-sdk#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Team-Falkor/plugin-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Team-Falkor/plugin-sdk/issues"
+  },
+  "author": "Team Falkor",
   "publishConfig": {
     "access": "public"
   },
